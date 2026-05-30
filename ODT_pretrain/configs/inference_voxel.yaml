@@ -1,0 +1,51 @@
+model:
+  class_name: model.odt_direct_inversion.ODTDirectInversion
+  encoder_ckpt: ""
+  freeze_encoder: true
+  memory_mode: all_frames
+  frame_count: 240
+  image_size: 256
+  patch_size: 16
+  num_cls_tokens: 16
+  voxel_size: [128, 256, 256]
+  voxel_grid: [8, 16, 16]
+  voxel_pos_tokenizer:
+    patch_size: 16
+    in_channels: 27  # 3 coords + 24 NeRF pos embedding
+  enc_emb_dim: 512
+  enc_nlayer: 16
+  enc_nhead: 16
+  dec_emb_dim: 512
+  dec_nlayer: 8
+  dec_nhead: 16
+  cross_attn_heads: 16
+  cross_attn_query_chunk_size: 256
+  cross_attn_dropout: 0.0
+  voxel_decoder_channels: [384, 192, 48, 12]
+  voxel_decoder_head_channels: 12
+  voxel_output_activation: sigmoid
+
+training:
+  dataset_name: data.odt_datasets.ODTFullPatchVoxelDataset
+  dataset_path:
+    - /data/lxy/odt_processdata_train_3d/train/full_list.txt
+  eval_dataset_path:
+    - /data/lxy/odt_processdata_train_3d/test/full_list.txt
+  checkpoint_dir: ./odt3dexperiments/checkpoints/odt_direct_inversion
+  exp_name: odt_voxel_inference
+  batch_size_per_gpu: 1
+  num_threads: 8
+  num_workers: 1
+  prefetch_factor: 2
+  use_amp: true
+  amp_dtype: bf16
+  use_tf32: true
+  seed: 777
+  l2_loss_weight: 1.0
+  l1_loss_weight: 0.0
+
+inference:
+  task: voxel_main
+  checkpoint_dir: ./odt3dexperiments/checkpoints/odt_direct_inversion
+  output_dir: ./odt3dexperiments/inference/odt_direct_inversion
+  compute_metrics: true

@@ -1,0 +1,39 @@
+model:
+  class_name: model.odt_mae.ODTMaskedAutoencoder
+  frame_count: 240
+  image_size: 256
+  patch_size: 16
+  num_cls_tokens: 16
+  mask_ratio: 0.75
+  enc_emb_dim: 512
+  enc_nlayer: 16
+  enc_nhead: 16
+  dec_emb_dim: 256
+  dec_nlayer: 8
+  dec_nhead: 16
+
+training:
+  dataset_name: data.odt_datasets.ODTMAEPackedPatchDataset
+  dataset_path:
+    - /data/lxy/odt_processdata_train_3d_patch/train/full_list.txt
+    - /data/lxy/odt_processdata_train_h1k293_patch/train/full_list.txt
+  eval_dataset_path:
+    - /data/lxy/odt_processdata_train_3d_patch/test/full_list.txt
+    - /data/lxy/odt_processdata_train_h1k293_patch/test/full_list.txt
+  checkpoint_dir: ./odt3dexperiments/checkpoints/odt_mae_pretrain
+  exp_name: odt_mae_inference
+  batch_size_per_gpu: 4
+  num_threads: 8
+  num_workers: 1
+  prefetch_factor: 4
+  use_amp: true
+  amp_dtype: bf16
+  use_tf32: true
+  seed: 777
+
+inference:
+  task: mae_pretrain
+  checkpoint_dir: ./odt3dexperiments/checkpoints/odt_mae_pretrain
+  output_dir: ./odt3dexperiments/inference/odt_mae_pretrain
+  max_items_per_batch: 2
+  random_eval_crop: false
