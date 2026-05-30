@@ -1,0 +1,43 @@
+# SinoTx MAE 预训练示例（正弦图自编码）。
+# 要求：本仓库根目录为包含 utils.py、SinoTx/、Unet_encdec_code_single/ 的上一级；
+#       使用 npy 数据集时，目录与字段约定与 Unet_encdec_code_single/data.py 中 SinogramDataset4npy 一致。
+#
+# 运行：
+#   cd SinoTx
+#   python main-ddp.py -cfg=config/example_pretrain.yaml -expName=mae_demo -verbose=1
+#
+# 产出：mae_demo-itrOut/SinoTx.log、encoder-ep*.pth 等；将 encoder 权重路径填入主训练 yaml 的 model.enc_weights。
+
+dataset:
+  inorm:
+    norm: true
+    kind: input_mul
+    input_mul: 0.002
+  onorm:
+    norm: true
+    kind: reciprocal_speed
+    ref_speed: 1500.0
+    perturb_scale: 30.0
+  input_key: field
+  target_key: speed
+  train_input: /path/to/npy/train_input_dir
+  train_output: /path/to/npy/train_speed_dir
+  test_input: /path/to/npy/test_input_dir
+  test_output: /path/to/npy/test_speed_dir
+  load2ram: true
+
+train:
+  mbsz: 64
+  maxep: 800
+  lr: 0.001
+  ckp_steps: 10
+  viz_every_n_epochs: 5
+
+model:
+  enc_emb_dim: 400
+  enc_nlayer: 16
+  enc_nhead: 16
+  dec_emb_dim: 256
+  dec_nlayer: 8
+  dec_nhead: 16
+  mask_ratio: 0.75
